@@ -4,6 +4,8 @@ import { Header } from '../components/layout/Header';
 import { SideNav } from '../components/layout/SideNav';
 import { BottomNav } from '../components/layout/BottomNav';
 import { SaveToast } from '../components/SaveToast';
+import { ChatPanel } from '../components/ChatPanel';
+import { LoginScreen } from '../features/auth/LoginScreen';
 import { RecordView } from '../features/record/RecordView';
 import { MetaView } from '../features/record/MetaView';
 import { RecordModal } from '../features/record/modals/RecordModal';
@@ -12,16 +14,19 @@ import { CoachModal } from '../features/feedback/modals/CoachModal';
 import { ProviderVerifyModal } from '../features/feedback/modals/ProviderVerifyModal';
 import { GroupView } from '../features/group/GroupView';
 import { PartyModal } from '../features/group/modals/PartyModal';
+import { CommunityView } from '../features/community/CommunityView';
+import { PostModal } from '../features/community/modals/PostModal';
+import { ProfileView } from '../features/profile/ProfileView';
 import { useAuthGate } from '../hooks/useAuthGate';
 import { useHeroesAndMeta } from '../hooks/useHeroesAndMeta';
 import { useGameRecords } from '../hooks/useGameRecords';
 import { useSaveNotice } from '../hooks/useSaveNotice';
-import { coaches, initialParties } from '../constants/mock';
-import type { Coach, Party, RecordDraft, RecordMode, View } from '../types';
+import { coaches, initialParties, initialPosts } from '../constants/mock';
+import type { Coach, Party, Post, RecordDraft, RecordMode, View } from '../types';
 
 export function HomePage() {
-  // ⚠️ 임시: LoginScreen이 아직 없어서 authenticated 게이트는 건너뜁니다.
-  const { authReady, profile, setProfile } = useAuthGate();
+  const { authenticated, authReady, onboarding, profile, setProfile, completeLogin, startApp, logout } =
+    useAuthGate();
   const { heroes, metaData } = useHeroesAndMeta();
   const { records, saveRecord, deleteRecord, clearRecords } = useGameRecords();
   const { saveNotice, notify, dismiss } = useSaveNotice();
@@ -57,11 +62,29 @@ export function HomePage() {
   const [parties, setParties] = useState<Party[]>(initialParties);
   const [partyOpen, setPartyOpen] = useState(false);
 
+  const [communityCategory, setCommunityCategory] =
+    useState<'전체' | '빠대용' | '경쟁용' | '스타디움용' | '사설방용' | 'OWCS용' | 'MVP'>('전체');
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [postOpen, setPostOpen] = useState(false);
+
   const [chatTitle, setChatTitle] = useState('');
+  const [chatMessages, setChatMessages] = useState([
+    '안녕하세요! 오늘도 즐겜해요 🙌',
+    '네, 저는 지원으로 갈게요.',
+  ]);
+  const [chatInput, setChatInput] = useState('');
   const [notificationOpen, setNotificationOpen] = useState(false);
 
   const selectedDate = `2026-08-${String(selectedDay).padStart(2, '0')}`;
   const calendarDays = useMemo(() => Array.from({ length: 42 }, (_, index) => index - 5), []);
+  const roleCounts = useMemo(
+    () => ({
+      tank: heroes.filter((hero) => hero.role === 'tank').length,
+      damage: heroes.filter((hero) => hero.role === 'damage').length,
+      support: heroes.filter((hero) => hero.role === 'support').length,
+    }),
+    [heroes],
+  );
 
   function openRecord(mode: RecordMode) {
     setSelectedMode(mode);
@@ -96,9 +119,9 @@ export function HomePage() {
     setRecordOpen(true);
   }
 
-  async function handleSaveRecord(event: FormEvent) {
+  function handleSaveRecord(event: FormEvent) {
     event.preventDefault();
-    await saveRecord(selectedDate, selectedMode, {
+    saveRecord(selectedDate, selectedMode, {
       kills: recordDraft.kills,
       assists: recordDraft.assists,
       deaths: recordDraft.deaths,
@@ -113,6 +136,10 @@ export function HomePage() {
     setRecordOpen(false);
   }
 
+  function saveProfile() {
+    notify('프로필이 저장되었습니다.', '게임 프로필과 선호 설정을 반영했습니다.');
+  }
+
   function beginMatching() {
     setMatching(true);
     setMatchDone(false);
@@ -120,6 +147,16 @@ export function HomePage() {
       setMatching(false);
       setMatchDone(true);
     }, 1100);
+  }
+
+  function sendMessage() {
+    if (!chatInput.trim()) return;
+    setChatMessages((current) => [...current, chatInput.trim()]);
+    setChatInput('');
+  }
+
+  function likePost(post: Post) {
+    setPosts((current) => current.map((item) => (item.id === post.id ? { ...item, likes: item.likes + 1 } : item)));
   }
 
   if (!authReady) {
@@ -131,6 +168,19 @@ export function HomePage() {
     );
   }
 
+  if (!authenticated) {
+    return (
+      <LoginScreen
+        onboarding={onboarding}
+        profile={profile}
+        setProfile={setProfile}
+        heroes={heroes}
+        onLogin={completeLogin}
+        onStart={startApp}
+      />
+    );
+  }
+
   return (
     <main className="min-h-dvh bg-ink text-paper pb-28">
       <Header
@@ -138,7 +188,7 @@ export function HomePage() {
         notificationOpen={notificationOpen}
         setNotificationOpen={setNotificationOpen}
         onProfile={() => setView('profile')}
-        />
+      />
 
       <div className="flex max-w-[1180px] mx-auto gap-8 px-4">
         <SideNav view={view} setView={setView} />
@@ -191,10 +241,25 @@ export function HomePage() {
           )}
 
           {view === 'community' && (
-            <div className="py-20 text-center text-muted">커뮤니티 화면은 다음 단계에서 만들 예정이에요.</div>
+            <CommunityView
+              posts={posts}
+              category={communityCategory}
+              setCategory={setCommunityCategory}
+              onCreate={() => setPostOpen(true)}
+              onLike={likePost}
+              heroes={heroes}
+            />
           )}
+
           {view === 'profile' && (
-            <div className="py-20 text-center text-muted">프로필 화면은 다음 단계에서 만들 예정이에요.</div>
+            <ProfileView
+              profile={profile}
+              setProfile={setProfile}
+              heroes={heroes}
+              roleCounts={roleCounts}
+              onSave={saveProfile}
+              onLogout={logout}
+            />
           )}
         </section>
       </div>
@@ -245,17 +310,25 @@ export function HomePage() {
         />
       )}
 
-      {/* ⚠️ 임시: 진짜 ChatPanel은 community 단계에서 만들 예정 */}
+      {postOpen && (
+        <PostModal
+          onClose={() => setPostOpen(false)}
+          onCreate={(post) => {
+            setPosts((current) => [post, ...current]);
+            setPostOpen(false);
+          }}
+        />
+      )}
+
       {chatTitle && (
-        <aside className="fixed right-4 bottom-24 z-40 w-72 p-4 border border-accent/40 bg-surface">
-          <div className="flex items-center justify-between mb-2">
-            <b>{chatTitle}</b>
-            <button onClick={() => setChatTitle('')} className="text-muted">
-              ×
-            </button>
-          </div>
-          <p className="text-muted text-xs">채팅 패널은 다음 단계에서 제대로 만들 예정이에요.</p>
-        </aside>
+        <ChatPanel
+          title={chatTitle}
+          messages={chatMessages}
+          input={chatInput}
+          setInput={setChatInput}
+          send={sendMessage}
+          close={() => setChatTitle('')}
+        />
       )}
     </main>
   );
