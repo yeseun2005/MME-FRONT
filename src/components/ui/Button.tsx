@@ -11,9 +11,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-ink hover:bg-[#ffd85a] disabled:opacity-40 disabled:grayscale-[65%] disabled:cursor-not-allowed',
-  outline: 'border border-accent/50 bg-transparent text-accent hover:bg-accent hover:text-ink',
-  danger: 'border border-red-400/40 bg-transparent text-red-400 h-[42px] text-[9px] font-black',
+  primary: 'rounded-lg bg-accent text-ink hover:bg-[#ffd85a] disabled:opacity-40 disabled:grayscale-[65%] disabled:cursor-not-allowed',
+  outline: 'rounded-lg border border-accent/50 bg-transparent text-accent hover:bg-accent hover:text-ink',
+  danger: 'rounded-lg border border-red-400/50 bg-red-400/10 text-red-400 hover:bg-red-400 hover:text-ink',
+};
+
+const iconBoxClasses: Record<ButtonVariant, string> = {
+  primary: 'bg-ink text-accent',
+  outline: 'bg-transparent text-inherit',
+  danger: 'bg-red-400/20 text-red-400',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -35,14 +41,14 @@ export function Button({
       className={cn(
         'inline-flex items-center justify-between gap-6 font-extrabold cursor-pointer transition-colors whitespace-nowrap',
         variantClasses[variant],
-        variant !== 'danger' && sizeClasses[size],
+        sizeClasses[size],
         className,
       )}
       {...rest}
     >
       <span>{children}</span>
       {icon && (
-        <span className="w-8.5 h-8.5 grid place-items-center bg-ink text-accent">
+        <span className={cn('w-8.5 h-8.5 grid place-items-center', iconBoxClasses[variant])}>
           {icon}
         </span>
       )}
