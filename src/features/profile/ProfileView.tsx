@@ -3,9 +3,10 @@ import { PageTitle } from '../../components/layout/PageTitle';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
 import { Card } from '../../components/ui/Card';
-import { tierOptions } from '../../constants/tiers';
+import { TierSelect } from '../../components/ui/TierSelect';
 import { heroImage } from '../../lib/format';
 import type { Hero, Profile } from '../../types';
+import { HeroSelect } from '../../components/ui/HeroSelect';
 
 export function ProfileView({
   profile,
@@ -93,15 +94,11 @@ export function ProfileView({
 
           <div className="grid grid-cols-2 gap-3 mb-4">
             <label className="grid gap-2 text-muted text-[11px] font-extrabold">
-              티어
-              <Select
-                value={profile.tier}
-                onChange={(event) => setProfile((current) => ({ ...current, tier: event.target.value }))}
-              >
-                {tierOptions.map((tier) => (
-                  <option key={tier}>{tier}</option>
-                ))}
-              </Select>
+                티어
+                <TierSelect
+                    value={profile.tier}
+                    onChange={(tier) => setProfile((current) => ({ ...current, tier }))}
+                />
             </label>
             <label className="grid gap-2 text-muted text-[11px] font-extrabold">
               포지션
@@ -116,32 +113,22 @@ export function ProfileView({
             </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-3 mb-4"> 
             <label className="grid gap-2 text-muted text-[11px] font-extrabold">
-              주 영웅 1
-              <Select
-                value={profile.heroes[0]}
-                onChange={(event) =>
-                  setProfile((current) => ({ ...current, heroes: [event.target.value, current.heroes[1]] }))
-                }
-              >
-                {heroes.map((hero) => (
-                  <option key={hero.id}>{hero.name}</option>
-                ))}
-              </Select>
-            </label>
-            <label className="grid gap-2 text-muted text-[11px] font-extrabold">
-              주 영웅 2
-              <Select
-                value={profile.heroes[1]}
-                onChange={(event) =>
-                  setProfile((current) => ({ ...current, heroes: [current.heroes[0], event.target.value] }))
-                }
-              >
-                {heroes.map((hero) => (
-                  <option key={hero.id}>{hero.name}</option>
-                ))}
-              </Select>
+                주 영웅 1
+                <HeroSelect
+                    heroes={heroes}
+                    value={profile.heroes[0]}
+                    onChange={(name) => setProfile((current) => ({ ...current, heroes: [name, current.heroes[1]] }))}
+                />
+                </label>
+                <label className="grid gap-2 text-muted text-[11px] font-extrabold">
+                주 영웅 2
+                <HeroSelect
+                    heroes={heroes}
+                    value={profile.heroes[1]}
+                    onChange={(name) => setProfile((current) => ({ ...current, heroes: [current.heroes[0], name] }))}
+                />
             </label>
           </div>
 
@@ -214,8 +201,12 @@ export function ProfileView({
           </div>
         </div>
 
-        <Button variant="danger" size="wide" className="mt-4" onClick={onLogout}>
-          계정 연동 해지 및 로그아웃
+        <Button
+            variant="danger"
+            className="mt-4 h-10 px-6 justify-center text-xs"
+            onClick={onLogout}
+            >
+            계정 연동 해지 및 로그아웃
         </Button>
       </section>
     </div>

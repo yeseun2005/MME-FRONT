@@ -6,6 +6,7 @@ import { Textarea } from '../../../components/ui/Textarea';
 import { Button } from '../../../components/ui/Button';
 import { tierOptions } from '../../../constants/tiers';
 import type { Hero, RecordDraft, RecordMode } from '../../../types';
+import { HeroSelect } from '../../../components/ui/HeroSelect';
 
 export function RecordModal({
   draft,
@@ -94,14 +95,11 @@ export function RecordModal({
         </FormGrid>
 
         <FormField label="플레이 영웅">
-          <Select
-            value={draft.hero}
-            onChange={(event) => setDraft((current) => ({ ...current, hero: event.target.value }))}
-          >
-            {heroes.map((hero) => (
-              <option key={hero.id}>{hero.name}</option>
-            ))}
-          </Select>
+            <HeroSelect
+                heroes={heroes}
+                value={draft.hero}
+                onChange={(name) => setDraft((current) => ({ ...current, hero: name }))}
+            />
         </FormField>
 
         <FormField label="한 줄 메모">

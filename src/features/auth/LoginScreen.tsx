@@ -4,6 +4,7 @@ import { Select } from '../../components/ui/Select';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import type { Hero, Profile } from '../../types';
+import { HeroSelect } from '../../components/ui/HeroSelect';
 
 const socialProviders = [
   { key: '카카오', label: '카카오로 시작하기', glyph: 'K' },
@@ -123,17 +124,12 @@ export function LoginScreen({
 
               <label className="grid gap-2 text-muted text-[11px] font-extrabold">
                 주 영웅
-                <Select
-                  value={profile.heroes[0]}
-                  onChange={(event) =>
-                    setProfile((current) => ({ ...current, heroes: [event.target.value, current.heroes[1]] }))
-                  }
-                >
-                  {heroes.map((hero) => (
-                    <option key={hero.id}>{hero.name}</option>
-                  ))}
-                </Select>
-              </label>
+                <HeroSelect
+                    heroes={heroes}
+                    value={profile.heroes[0]}
+                    onChange={(name) => setProfile((current) => ({ ...current, heroes: [name, current.heroes[1]] }))}
+                />
+                </label>
 
               <Button variant="primary" size="wide" icon="→" onClick={onStart}>
                 MMe 시작하기
