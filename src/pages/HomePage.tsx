@@ -73,7 +73,6 @@ export function HomePage() {
     '네, 저는 지원으로 갈게요.',
   ]);
   const [chatInput, setChatInput] = useState('');
-  const [notificationOpen, setNotificationOpen] = useState(false);
 
   const selectedDate = `2026-08-${String(selectedDay).padStart(2, '0')}`;
   const calendarDays = useMemo(() => Array.from({ length: 42 }, (_, index) => index - 5), []);
@@ -158,6 +157,34 @@ export function HomePage() {
   function likePost(post: Post) {
     setPosts((current) => current.map((item) => (item.id === post.id ? { ...item, likes: item.likes + 1 } : item)));
   }
+  
+  function addComment(post: Post, body: string) {
+    setPosts((current) =>
+        current.map((item) =>
+        item.id === post.id
+            ? { ...item, comments: [...item.comments, { id: Date.now(), author: 'MekaPilot', body, time: '방금 전' }] }
+            : item,
+        ),
+    );
+    }
+
+  function editComment(post: Post, commentId: number, body: string) {
+    setPosts((current) =>
+      current.map((item) =>
+        item.id === post.id
+          ? { ...item, comments: item.comments.map((comment) => (comment.id === commentId ? { ...comment, body } : comment)) }
+          : item,
+      ),
+    );
+  }
+
+  function deleteComment(post: Post, commentId: number) {
+    setPosts((current) =>
+      current.map((item) =>
+        item.id === post.id ? { ...item, comments: item.comments.filter((comment) => comment.id !== commentId) } : item,
+      ),
+    );
+  }
 
   if (!authReady) {
     return (
@@ -185,12 +212,10 @@ export function HomePage() {
     <main className="min-h-dvh bg-ink text-paper pb-28">
       <Header
         profile={profile}
-        notificationOpen={notificationOpen}
-        setNotificationOpen={setNotificationOpen}
         onProfile={() => setView('profile')}
       />
-
-      <div className="flex max-w-[1180px] mx-auto gap-8 px-4">
+      
+      <div className="flex max-w-[1180px] mx-auto gap-8 px-4 pt-6">
         <SideNav view={view} setView={setView} />
 
         <section className="flex-1 min-w-0">
@@ -240,16 +265,19 @@ export function HomePage() {
             />
           )}
 
-          {view === 'community' && (
+        {view === 'community' && (
             <CommunityView
-              posts={posts}
-              category={communityCategory}
-              setCategory={setCommunityCategory}
-              onCreate={() => setPostOpen(true)}
-              onLike={likePost}
-              heroes={heroes}
+                posts={posts}
+                category={communityCategory}
+                setCategory={setCommunityCategory}
+                onCreate={() => setPostOpen(true)}
+                onLike={likePost}
+                onCommentAdd={addComment}
+                onCommentEdit={editComment}
+                onCommentDelete={deleteComment}
+                heroes={heroes}
             />
-          )}
+            )}
 
           {view === 'profile' && (
             <ProfileView

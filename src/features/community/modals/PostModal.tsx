@@ -23,16 +23,16 @@ export function PostModal({
   function handleSubmit() {
     if (!title.trim()) return;
     onCreate({
-      id: Date.now(),
-      category,
-      title,
-      author: 'MekaPilot',
-      time: '방금 전',
-      likes: 0,
-      comments: 0,
-      body,
+        id: Date.now(),
+        category,
+        title,
+        author: 'MekaPilot',
+        time: '방금 전',
+        likes: 0,
+        comments: [],
+        body,
     });
-  }
+    }
 
   return (
     <Modal onClose={onClose} label="커뮤니티 글쓰기">

@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
 import { heroImage } from '../../lib/format';
+import { PostDetailModal } from './modals/PostDetailModal';
 import type { Hero, Post } from '../../types';
 
 const categories = ['전체', '빠대용', '경쟁용', '스타디움용', '사설방용', 'OWCS용', 'MVP'] as const;
@@ -21,6 +23,9 @@ export function CommunityView({
   setCategory,
   onCreate,
   onLike,
+  onCommentAdd,
+  onCommentEdit,
+  onCommentDelete,
   heroes,
 }: {
   posts: Post[];
@@ -28,11 +33,16 @@ export function CommunityView({
   setCategory: (category: (typeof categories)[number]) => void;
   onCreate: () => void;
   onLike: (post: Post) => void;
+  onCommentAdd: (post: Post, body: string) => void;
+  onCommentEdit: (post: Post, commentId: number, body: string) => void;
+  onCommentDelete: (post: Post, commentId: number) => void;
   heroes: Hero[];
 }) {
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
   const mvpPosts = posts
     .slice()
-    .sort((a, b) => b.likes * 2 + b.comments - (a.likes * 2 + a.comments))
+    .sort((a, b) => b.likes * 2 + b.comments.length - (a.likes * 2 + a.comments.length))
     .slice(0, 5);
   const filtered = category === '전체' ? posts : category === 'MVP' ? mvpPosts : posts.filter((post) => post.category === category);
   const isMvp = category === 'MVP';
@@ -92,16 +102,20 @@ export function CommunityView({
       <div className="grid grid-cols-[1fr_280px] gap-6 max-[900px]:grid-cols-1">
         <div className="grid gap-3">
           {filtered.map((post, index) => (
-            <Card key={post.id} className={`p-5 flex gap-4 ${index === 0 ? 'border-accent/40' : ''}`}>
+            <Card
+              key={post.id}
+              className={`p-5 flex gap-4 cursor-pointer hover:border-accent/40 ${index === 0 ? 'border-accent/40' : ''}`}
+              onClick={() => setSelectedPost(post)}
+            >
               <div className="text-muted text-xl font-black w-8 shrink-0">{String(index + 1).padStart(2, '0')}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2 text-xs">
                   <span className="text-accent font-bold">{isMvp ? 'MVP SELECTED' : post.category}</span>
                   <i className="not-italic text-muted">{post.time}</i>
-                  {isMvp && <b className="text-[#d856ff]">SCORE {post.likes * 2 + post.comments}</b>}
+                  {isMvp && <b className="text-[#d856ff]">SCORE {post.likes * 2 + post.comments.length}</b>}
                 </div>
-                <h3 className="font-black mb-1">{post.title}</h3>
-                <p className="text-muted text-sm mb-2">{post.body}</p>
+                <h3 className="font-black mb-1 break-keep">{post.title}</h3>
+                <p className="text-muted text-sm mb-2 line-clamp-2 break-keep">{post.body}</p>
                 <div className="flex items-center gap-2 text-xs">
                   <b>{post.author}</b>
                   <span className="text-muted">{post.category}</span>
@@ -112,10 +126,16 @@ export function CommunityView({
                 <img src={heroImage(heroes, post.hero)} alt="" className="w-16 h-16 object-cover shrink-0" />
               )}
               <div className="flex flex-col items-end justify-between shrink-0">
-                <button onClick={() => onLike(post)} className="text-accent text-sm font-bold">
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onLike(post);
+                  }}
+                  className="text-accent text-sm font-bold"
+                >
                   ▲ <b>{post.likes}</b>
                 </button>
-                <span className="text-muted text-xs">댓글 {post.comments}</span>
+                <span className="text-muted text-xs">댓글 {post.comments.length}</span>
               </div>
             </Card>
           ))}
@@ -143,6 +163,48 @@ export function CommunityView({
           </p>
         </aside>
       </div>
+
+      {selectedPost && (
+        <PostDetailModal
+            post={selectedPost}
+            heroes={heroes}
+            onClose={() => setSelectedPost(null)}
+            onLike={(post) => {
+            onLike(post);
+            setSelectedPost((current) => (current ? { ...current, likes: current.likes + 1 } : current));
+            }}
+            onComment={(post, body) => {
+            onCommentAdd(post, body);
+            setSelectedPost((current) =>
+                current
+                ? {
+                    ...current,
+                    comments: [...current.comments, { id: Date.now(), author: 'MekaPilot', body, time: '방금 전' }],
+                    }
+                : current,
+            );
+            }}
+            onEditComment={(post, commentId, body) => {
+            onCommentEdit(post, commentId, body);
+            setSelectedPost((current) =>
+                current
+                ? {
+                    ...current,
+                    comments: current.comments.map((comment) =>
+                        comment.id === commentId ? { ...comment, body } : comment,
+                    ),
+                    }
+                : current,
+            );
+            }}
+            onDeleteComment={(post, commentId) => {
+            onCommentDelete(post, commentId);
+            setSelectedPost((current) =>
+                current ? { ...current, comments: current.comments.filter((comment) => comment.id !== commentId) } : current,
+            );
+            }}
+        />
+        )}
     </div>
   );
 }

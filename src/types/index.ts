@@ -75,6 +75,13 @@ export type Party = {
   voice: boolean;
 };
 
+export type Comment = {
+  id: number;
+  author: string;
+  body: string;
+  time: string;
+};
+
 export type Post = {
   id: number;
   category: string;
@@ -82,7 +89,7 @@ export type Post = {
   author: string;
   time: string;
   likes: number;
-  comments: number;
+  comments: Comment[];
   hero?: string;
   body: string;
 };
