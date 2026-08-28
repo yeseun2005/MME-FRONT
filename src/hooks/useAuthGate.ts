@@ -7,6 +7,7 @@ const defaultProfile: Profile = {
   position: '돌격',
   heroes: ['D.Va', '아나'],
   nexon: false,
+  notificationsEnabled: true,
   providerStatus: 'none',
 };
 

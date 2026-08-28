@@ -1,5 +1,4 @@
 export type View = 'record' | 'feedback' | 'group' | 'community' | 'profile';
-export type Theme = 'dark' | 'light';
 
 export type Hero = {
   id: string;
@@ -45,6 +44,7 @@ export type Profile = {
   position: string;
   heroes: string[];
   nexon: boolean;
+  notificationsEnabled: boolean;
   providerStatus: 'none' | 'review' | 'approved';
   providerType?: '상위 500위' | '프로게이머';
 };
