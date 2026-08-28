@@ -1,0 +1,2 @@
+export const tierNames = ['브론즈', '실버', '골드', '플래티넘', '에메랄드', '다이아몬드', '마스터', '그랜드마스터', '챔피언'];
+export const tierOptions = tierNames.flatMap((tier) => [5, 4, 3, 2, 1].map((division) => `${tier} ${division}`));
