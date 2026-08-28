@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/noto-sans-kr';
+
+/* class="dark" 붙었을 때 dark: 유틸리티가 동작하도록 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-ink: #0c0c0e;
+  --color-surface: #17171b;
+  --color-surface-2: #24242a;
+  --color-accent: #f5c542;    /* 원본 --yellow */
+  --color-gold: #d9a92e;
+  --color-paper: #f4f1e8;
+  --color-muted: #a8a8b3;
+
+  --font-sans: 'Noto Sans KR Variable', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+}
