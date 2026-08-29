@@ -35,7 +35,7 @@ export function HomePage() {
   const { records, saveRecord, deleteRecord, clearRecords } = useGameRecords();
   const { saveNotice, notify, dismiss } = useSaveNotice();
   const { theme, toggleTheme } = useTheme();
-  const { notifications, unreadCount, push: pushNotification, markRead, markAllRead } = useNotifications(
+  const { notifications, unreadCount, push: pushNotification, markAllRead } = useNotifications(
     profile.notificationsEnabled,
   );
 
