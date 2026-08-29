@@ -13,6 +13,15 @@ const credentialOptions = [
   { value: '프로게이머', glyph: 'PRO', hint: '소속·대회 경력 증빙' },
 ] as const;
 
+type Stage = 'form' | 'review' | 'approved' | 'rejected';
+
+function initialStage(status: Profile['providerStatus']): Stage {
+  if (status === 'review') return 'review';
+  if (status === 'rejected') return 'rejected';
+  if (status === 'approved') return 'approved';
+  return 'form';
+}
+
 export function ProviderVerifyModal({
   profile,
   setProfile,
@@ -22,20 +31,36 @@ export function ProviderVerifyModal({
   setProfile: Dispatch<SetStateAction<Profile>>;
   onClose: () => void;
 }) {
+  const [stage, setStage] = useState<Stage>(initialStage(profile.providerStatus));
   const [type, setType] = useState<'상위 500위' | '프로게이머'>(profile.providerType || '상위 500위');
-  const [submitted, setSubmitted] = useState(profile.providerStatus === 'review');
+  const [nickname, setNickname] = useState(profile.nickname);
+  const [battletag, setBattletag] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   async function submitVerification() {
-    setSubmitting(true);
     setSubmitError('');
+    if (!battletag.trim() || !phone.trim() || !email.trim()) {
+      setSubmitError('배틀태그, 전화번호, 이메일을 모두 입력해 주세요.');
+      return;
+    }
+    if (!proofFile) {
+      setSubmitError('검수할 증빙 파일을 첨부해 주세요.');
+      return;
+    }
+
+    setSubmitting(true);
     try {
-      if (!proofFile) throw new Error('검수할 증빙 파일을 첨부해 주세요.');
       const proof = await fileToDataUrl(proofFile);
       saveVerification({
         type,
+        nickname,
+        battletag,
+        phone,
+        email,
         status: 'review',
         proofData: proof.dataUrl,
         proofName: proof.name,
@@ -43,8 +68,13 @@ export function ProviderVerifyModal({
         proofSize: proof.size,
         submittedAt: Date.now(),
       });
-      setProfile((current) => ({ ...current, providerStatus: 'review', providerType: type }));
-      setSubmitted(true);
+      setProfile((current) => ({
+        ...current,
+        providerStatus: 'review',
+        providerType: type,
+        providerRejectReason: undefined,
+      }));
+      setStage('review');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : '인증 신청을 저장하지 못했습니다.');
     } finally {
@@ -52,7 +82,7 @@ export function ProviderVerifyModal({
     }
   }
 
-  if (submitted) {
+  if (stage === 'review') {
     return (
       <Modal onClose={onClose} label="피드백 제공자 인증 상태">
         <div className="text-center py-8">
@@ -60,12 +90,51 @@ export function ProviderVerifyModal({
           <p className="text-accent text-[11px] font-extrabold tracking-[0.2em] mt-3">VERIFICATION IN REVIEW</p>
           <h3 className="font-black text-xl mt-2">자격 자료를 검토하고 있어요.</h3>
           <p className="text-muted text-sm mt-2">
-            {type} 인증 신청이 Firebase에 접수됐습니다.
+            {type} 인증 신청이 접수됐습니다.
             <br />
             운영자 검수 후 결과를 알려드려요.
           </p>
           <Button className="mt-6" onClick={onClose}>
             확인
+          </Button>
+        </div>
+      </Modal>
+    );
+  }
+
+    if (stage === 'approved') {
+    return (
+      <Modal onClose={onClose} label="피드백 제공자 인증 완료">
+        <div className="text-center py-8">
+          <span className="text-3xl text-accent">✓</span>
+          <p className="text-accent text-[11px] font-extrabold tracking-[0.2em] mt-3">VERIFICATION APPROVED</p>
+          <h3 className="font-black text-xl mt-2">이미 인증이 완료됐어요.</h3>
+          <p className="text-muted text-sm mt-2">
+            {profile.providerType} 자격으로 승인됐습니다.
+            <br />
+            피드백 페이지에서 구인글을 작성할 수 있어요.
+          </p>
+          <Button className="mt-6" onClick={onClose}>
+            확인
+          </Button>
+        </div>
+      </Modal>
+    );
+  }
+
+  if (stage === 'rejected') {
+    return (
+      <Modal onClose={onClose} label="피드백 제공자 인증 반려">
+        <div className="text-center py-8">
+          <span className="text-3xl text-red-400">✕</span>
+          <p className="text-red-400 text-[11px] font-extrabold tracking-[0.2em] mt-3">VERIFICATION REJECTED</p>
+          <h3 className="font-black text-xl mt-2">신청이 반려됐어요.</h3>
+          <p className="text-muted text-sm mt-2 mb-1">반려 사유</p>
+          <p className="text-paper text-sm border border-red-400/30 bg-red-400/5 px-4 py-3 mx-auto max-w-[420px]">
+            {profile.providerRejectReason || '사유가 등록되지 않았습니다.'}
+          </p>
+          <Button className="mt-6" onClick={() => setStage('form')} icon="→">
+            자료 보완 후 재신청
           </Button>
         </div>
       </Modal>
@@ -101,19 +170,28 @@ export function ProviderVerifyModal({
       <div className="grid gap-4">
         <FormGrid>
           <FormField label="배틀태그">
-            <Input placeholder="Player#1234" />
+            <Input
+              placeholder="Player#1234"
+              value={battletag}
+              onChange={(event) => setBattletag(event.target.value)}
+            />
           </FormField>
           <FormField label="활동 닉네임">
-            <Input defaultValue={profile.nickname} />
+            <Input value={nickname} onChange={(event) => setNickname(event.target.value)} />
           </FormField>
         </FormGrid>
 
         <FormGrid>
           <FormField label="전화번호">
-            <Input placeholder="010-0000-0000" />
+            <Input placeholder="010-0000-0000" value={phone} onChange={(event) => setPhone(event.target.value)} />
           </FormField>
           <FormField label="이메일">
-            <Input type="email" placeholder="player@example.com" />
+            <Input
+              type="email"
+              placeholder="player@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
           </FormField>
         </FormGrid>
 

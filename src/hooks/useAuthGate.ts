@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Profile } from '../types';
+import { clearLocalRecords } from '../lib/recordStorage';
 
 const defaultProfile: Profile = {
   nickname: 'MekaPilot',
@@ -42,7 +43,14 @@ export function useAuthGate() {
   }
 
   function logout() {
+    // 민감한 로컬 상태 정리 (F-PRO-008)
+    localStorage.removeItem('mme-profile');
+    localStorage.removeItem('mme-verification');
+    clearLocalRecords();
+
     localStorage.setItem('mme-auth', 'false');
+    setProfile(defaultProfile);
+    setOnboarding(false);
     setAuthenticated(false);
   }
 

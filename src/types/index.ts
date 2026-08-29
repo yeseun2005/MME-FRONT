@@ -1,4 +1,4 @@
-export type View = 'record' | 'feedback' | 'group' | 'community' | 'profile';
+export type View = 'record' | 'feedback' | 'group' | 'community' | 'profile' | 'admin';
 
 export type Hero = {
   id: string;
@@ -45,8 +45,9 @@ export type Profile = {
   heroes: string[];
   nexon: boolean;
   notificationsEnabled: boolean;
-  providerStatus: 'none' | 'review' | 'approved';
+  providerStatus: 'none' | 'review' | 'approved' | 'rejected';
   providerType?: '상위 500위' | '프로게이머';
+  providerRejectReason?: string;
 };
 
 export type Coach = {
