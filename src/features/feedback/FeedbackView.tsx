@@ -21,6 +21,7 @@ export function FeedbackView({
   onCoach,
   onChat,
   onVerify,
+  onWriteJobPost,
   profile,
 }: {
   coaches: Coach[];
@@ -29,6 +30,7 @@ export function FeedbackView({
   onCoach: (coach: Coach) => void;
   onChat: (title: string) => void;
   onVerify: () => void;
+  onWriteJobPost: () => void;
   profile: Profile;
 }) {
   const filtered = filter === '전체' ? coaches : coaches.filter((coach) => coach.position === filter);
@@ -37,10 +39,12 @@ export function FeedbackView({
       ? `${profile.providerType} 인증 완료 · 구인글을 작성할 수 있어요.`
       : profile.providerStatus === 'review'
         ? '제출한 자료를 검토하고 있어요. 보통 1~2일이 걸립니다.'
-        : '상위 500위 챌린저 또는 프로게이머라면 자격 인증을 신청할 수 있어요.';
+        : profile.providerStatus === 'rejected'
+          ? `신청이 반려됐어요 · ${profile.providerRejectReason || '사유 확인 필요'}`
+          : '상위 500위 챌린저 또는 프로게이머라면 자격 인증을 신청할 수 있어요.';
 
   return (
-    <div className="max-w-[1040px] mx-auto py-12 px-4">
+    <div className="max-w-[88vw] xl:max-w-[1240px] mx-auto py-12 px-4">
       <PageTitle
         eyebrow="COACHING MARKET"
         title="검증된 플레이어와"
@@ -54,6 +58,7 @@ export function FeedbackView({
             <Button
               size="compact"
               disabled={profile.providerStatus !== 'approved'}
+              onClick={onWriteJobPost}
               className="max-[760px]:flex-1"
               icon="＋"
             >
@@ -72,7 +77,7 @@ export function FeedbackView({
           <p className="text-muted text-xs mt-1">{statusCopy}</p>
         </div>
         <button onClick={onVerify} className="text-accent text-xs font-bold">
-          {profile.providerStatus === 'none' ? '인증 신청' : '상태 확인'}
+          {profile.providerStatus === 'none' ? '인증 신청' : profile.providerStatus === 'rejected' ? '재신청' : '상태 확인'}
         </button>
       </section>
 
@@ -130,7 +135,7 @@ export function FeedbackView({
         ))}
       </div>
 
-      <section className="p-8 border border-white/10 text-center">
+      <section className="p-8 border border-white/10 bg-surface text-center">
         <p className="text-accent text-[11px] font-extrabold tracking-[0.2em]">HOW IT WORKS</p>
         <h2 className="font-black text-2xl mt-2 mb-8">피드백은 이렇게 진행돼요.</h2>
         <div className="grid grid-cols-3 gap-6 max-[600px]:grid-cols-1">

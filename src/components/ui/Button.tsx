@@ -11,13 +11,14 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'rounded-lg bg-accent text-ink hover:bg-[#ffd85a] disabled:opacity-40 disabled:grayscale-[65%] disabled:cursor-not-allowed',
+  primary:
+    'rounded-lg bg-accent text-ink hover:bg-[#ffd85a] disabled:bg-surface-2 disabled:text-muted disabled:cursor-not-allowed disabled:hover:bg-surface-2',
   outline: 'rounded-lg border border-accent/50 bg-transparent text-accent hover:bg-accent hover:text-ink',
   danger: 'rounded-lg border border-red-400/50 bg-red-400/10 text-red-400 hover:bg-red-400 hover:text-ink',
 };
 
 const iconBoxClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-ink text-accent',
+  primary: 'bg-transparent border border-ink/30 text-ink',
   outline: 'bg-transparent text-inherit',
   danger: 'bg-red-400/20 text-red-400',
 };
@@ -34,10 +35,12 @@ export function Button({
   icon,
   children,
   className,
+  disabled,
   ...rest
 }: ButtonProps) {
   return (
     <button
+      disabled={disabled}
       className={cn(
         'inline-flex items-center justify-between gap-6 font-extrabold cursor-pointer transition-colors whitespace-nowrap',
         variantClasses[variant],
@@ -48,7 +51,12 @@ export function Button({
     >
       <span>{children}</span>
       {icon && (
-        <span className={cn('w-8.5 h-8.5 grid place-items-center', iconBoxClasses[variant])}>
+        <span
+          className={cn(
+            'w-8.5 h-8.5 grid place-items-center',
+            disabled ? 'bg-muted/20 text-muted' : iconBoxClasses[variant],
+          )}
+        >
           {icon}
         </span>
       )}
