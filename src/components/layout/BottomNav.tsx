@@ -5,7 +5,7 @@ export function BottomNav({ view, setView }: { view: View; setView: (view: View)
   return (
     <nav
       aria-label="주요 메뉴"
-      className="lg:hidden fixed left-1/2 bottom-4.5 z-20 w-[min(720px,calc(100%-28px))] h-[70px] p-1.5 grid grid-cols-5 -translate-x-1/2 border border-white/10 bg-[#121216]/92 shadow-2xl backdrop-blur-lg"
+      className="lg:hidden fixed left-1/2 bottom-4.5 z-20 w-[min(820px,calc(100%-28px))] h-[70px] p-1.5 grid grid-cols-6 -translate-x-1/2 border border-white/10 bg-[#121216]/92 shadow-2xl backdrop-blur-lg"
     >
       {navItems.map((item) => (
         <button
