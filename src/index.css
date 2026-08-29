@@ -5,15 +5,46 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  /* 고정값: 테마와 무관하게 항상 어둡게 유지 (포인트 색 위 대비 텍스트/버튼용) */
   --color-ink: #0c0c0e;
+
+  /* 테마에 따라 바뀌는 값 */
+  --color-bg: #0c0c0e;
   --color-surface: #17171b;
   --color-surface-2: #24242a;
-  --color-accent: #f5c542;    /* 원본 --yellow */
+  --color-accent: #f5c542;
   --color-gold: #d9a92e;
   --color-paper: #f4f1e8;
   --color-muted: #a8a8b3;
 
   --font-sans: 'Noto Sans KR Variable', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+}
+
+:root.light {
+  --color-bg: #faf8ef;
+  --color-surface: #ffffff;
+  --color-surface-2: #f2efe0;
+  --color-accent: #b8860b;
+  --color-gold: #8a6511;
+  --color-paper: #1c1b17;
+  --color-muted: #6f6b5c;
+}
+
+/* 강조 패널 고정 스타일: 그룹찾기 방식 선택, 티어기록 캘린더·랭크·기록 카드,
+   내 정보 설정 패널, 커뮤니티 인기 영웅, 피드백 안내 섹션은 라이트 모드에서도
+   다크 톤을 그대로 유지한다 */
+.panel-fixed {
+  background-color: #17171b;
+  color: #f4f1e8;
+}
+.panel-fixed .text-muted {
+  color: #a8a8b3;
+}
+.panel-fixed .text-accent {
+  color: #f5c542;
+}
+.panel-fixed .text-paper:not(input):not(select):not(textarea) {
+  color: #f4f1e8;
 }
 
 * {
@@ -23,4 +54,5 @@
 body {
   margin: 0;
   font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

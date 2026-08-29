@@ -28,10 +28,12 @@ export function ProfileView({
       ? `${profile.providerType} 인증 완료`
       : profile.providerStatus === 'review'
         ? '운영자 검수 중'
-        : '미신청';
+        : profile.providerStatus === 'rejected'
+          ? `반려됨 · ${profile.providerRejectReason || '사유 확인 필요'}`
+          : '미신청';
 
   return (
-    <div className="max-w-[1040px] mx-auto py-12 px-4">
+    <div className="max-w-[88vw] xl:max-w-[1240px] mx-auto py-12 px-4">
       <PageTitle
         eyebrow="PLAYER PROFILE"
         title="나만의"
@@ -132,16 +134,18 @@ export function ProfileView({
             </label>
           </div>
 
-          <div className="flex items-center gap-4 mb-6">
-            {profile.heroes.map((name) => (
-              <div key={name} className="flex items-center gap-2">
-                {heroImage(heroes, name) && (
-                  <img src={heroImage(heroes, name)} alt="" className="w-9 h-9 object-cover" />
-                )}
-                <span className="text-sm">{name}</span>
-              </div>
-            ))}
-            <small className="text-muted text-xs ml-auto">
+          <div className="mb-6">
+            <div className="flex items-center flex-wrap gap-4">
+              {profile.heroes.map((name, index) => (
+                <div key={`hero-slot-${index}`} className="flex items-center gap-2 shrink-0">
+                  {heroImage(heroes, name) && (
+                    <img src={heroImage(heroes, name)} alt="" className="w-9 h-9 object-cover shrink-0" />
+                  )}
+                  <span className="text-sm whitespace-nowrap">{name}</span>
+                </div>
+              ))}
+            </div>
+            <small className="block text-muted text-xs mt-3">
               영웅 데이터 {heroes.length}명 · 돌격 {roleCounts.tank} · 공격 {roleCounts.damage} · 지원 {roleCounts.support}
             </small>
           </div>

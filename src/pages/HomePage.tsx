@@ -17,11 +17,15 @@ import { PartyModal } from '../features/group/modals/PartyModal';
 import { CommunityView } from '../features/community/CommunityView';
 import { PostModal } from '../features/community/modals/PostModal';
 import { ProfileView } from '../features/profile/ProfileView';
+import { AdminView } from '../features/admin/AdminView';
 import { useAuthGate } from '../hooks/useAuthGate';
 import { useHeroesAndMeta } from '../hooks/useHeroesAndMeta';
 import { useGameRecords } from '../hooks/useGameRecords';
 import { useSaveNotice } from '../hooks/useSaveNotice';
+import { useTheme } from '../hooks/useTheme';
+import { useNotifications } from '../hooks/useNotifications';
 import { coaches, initialParties, initialPosts } from '../constants/mock';
+import { JobPostModal } from '../features/feedback/modals/JobPostModal';
 import type { Coach, Party, Post, RecordDraft, RecordMode, View } from '../types';
 
 export function HomePage() {
@@ -30,9 +34,14 @@ export function HomePage() {
   const { heroes, metaData } = useHeroesAndMeta();
   const { records, saveRecord, deleteRecord, clearRecords } = useGameRecords();
   const { saveNotice, notify, dismiss } = useSaveNotice();
+  const { theme, toggleTheme } = useTheme();
+  const { notifications, unreadCount, push: pushNotification, markAllRead } = useNotifications(
+    profile.notificationsEnabled,
+  );
 
   const [view, setView] = useState<View>('record');
   const [recordSection, setRecordSection] = useState<'diary' | 'meta'>('diary');
+  const [notifOpen, setNotifOpen] = useState(false);
 
   const [selectedDay, setSelectedDay] = useState(26);
   const [selectedMode, setSelectedMode] = useState<RecordMode>('경쟁전');
@@ -54,6 +63,7 @@ export function HomePage() {
   const [selectedCoach, setSelectedCoach] = useState<Coach | null>(null);
   const [feedbackRequested, setFeedbackRequested] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
+  const [jobPostOpen, setJobPostOpen] = useState(false);
 
   const [groupMode, setGroupMode] = useState<'home' | 'random' | 'select'>('home');
   const [partySize, setPartySize] = useState(4);
@@ -132,6 +142,7 @@ export function HomePage() {
       videoUrl: recordDraft.videoUrl,
     });
     notify(`${selectedMode} 기록이 저장되었습니다.`, '기기에 안전하게 저장했습니다.');
+    pushNotification('기록', `${selectedMode} 기록이 저장됐어요`, `${selectedDate} · ${recordDraft.hero}`, 'record');
     setRecordOpen(false);
   }
 
@@ -145,6 +156,7 @@ export function HomePage() {
     window.setTimeout(() => {
       setMatching(false);
       setMatchDone(true);
+      pushNotification('매칭', '팀이 완성됐어요!', `${partySize}인 랜덤팟 매칭이 완료됐어요.`, 'group');
     }, 1100);
   }
 
@@ -157,16 +169,16 @@ export function HomePage() {
   function likePost(post: Post) {
     setPosts((current) => current.map((item) => (item.id === post.id ? { ...item, likes: item.likes + 1 } : item)));
   }
-  
+
   function addComment(post: Post, body: string) {
     setPosts((current) =>
-        current.map((item) =>
+      current.map((item) =>
         item.id === post.id
-            ? { ...item, comments: [...item.comments, { id: Date.now(), author: 'MekaPilot', body, time: '방금 전' }] }
-            : item,
-        ),
+          ? { ...item, comments: [...item.comments, { id: Date.now(), author: 'MekaPilot', body, time: '방금 전' }] }
+          : item,
+      ),
     );
-    }
+  }
 
   function editComment(post: Post, commentId: number, body: string) {
     setPosts((current) =>
@@ -186,9 +198,14 @@ export function HomePage() {
     );
   }
 
+  function handleSelectNotif(target: View) {
+    setView(target);
+    setNotifOpen(false);
+  }
+
   if (!authReady) {
     return (
-      <main className="min-h-dvh grid place-content-center gap-5 justify-items-center bg-ink text-accent text-[10px] font-black tracking-[0.26em]">
+      <main className="min-h-dvh grid place-content-center gap-5 justify-items-center bg-bg text-accent text-[10px] font-black tracking-[0.26em]">
         <div className="w-20 h-20 grid place-items-center bg-accent text-ink text-2xl font-black">MM</div>
         LOADING ARCHIVE
       </main>
@@ -209,13 +226,21 @@ export function HomePage() {
   }
 
   return (
-    <main className="min-h-dvh bg-ink text-paper pb-28">
+    <main className="bg-bg text-paper pb-16 lg:pb-20">
       <Header
         profile={profile}
         onProfile={() => setView('profile')}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        notifications={notifications}
+        unreadCount={unreadCount}
+        notifOpen={notifOpen}
+        onToggleNotif={() => setNotifOpen((current) => !current)}
+        onSelectNotif={handleSelectNotif}
+        onMarkAllRead={markAllRead}
       />
-      
-      <div className="flex max-w-[1180px] mx-auto gap-8 px-4 pt-6">
+
+      <div className="flex w-full max-w-[1600px] mx-auto gap-8 px-8 pt-6">
         <SideNav view={view} setView={setView} />
 
         <section className="flex-1 min-w-0">
@@ -246,6 +271,7 @@ export function HomePage() {
               onCoach={setSelectedCoach}
               onChat={setChatTitle}
               onVerify={() => setVerificationOpen(true)}
+              onWriteJobPost={() => setJobPostOpen(true)}
               profile={profile}
             />
           )}
@@ -265,19 +291,19 @@ export function HomePage() {
             />
           )}
 
-        {view === 'community' && (
+          {view === 'community' && (
             <CommunityView
-                posts={posts}
-                category={communityCategory}
-                setCategory={setCommunityCategory}
-                onCreate={() => setPostOpen(true)}
-                onLike={likePost}
-                onCommentAdd={addComment}
-                onCommentEdit={editComment}
-                onCommentDelete={deleteComment}
-                heroes={heroes}
+              posts={posts}
+              category={communityCategory}
+              setCategory={setCommunityCategory}
+              onCreate={() => setPostOpen(true)}
+              onLike={likePost}
+              onCommentAdd={addComment}
+              onCommentEdit={editComment}
+              onCommentDelete={deleteComment}
+              heroes={heroes}
             />
-            )}
+          )}
 
           {view === 'profile' && (
             <ProfileView
@@ -289,6 +315,29 @@ export function HomePage() {
               onLogout={logout}
             />
           )}
+
+          {view === 'admin' && (
+            <AdminView
+              onResolved={(result) => {
+                if (!result.isMine) return;
+                setProfile((current) => ({
+                  ...current,
+                  providerStatus: result.status === '승인' ? 'approved' : 'rejected',
+                  providerType: result.status === '승인' ? result.credential : current.providerType,
+                  providerRejectReason: result.status === '반려' ? result.reason : undefined,
+                }));
+                pushNotification(
+                  '검수결과',
+                  result.status === '승인' ? '제공자 인증이 승인됐어요' : '제공자 인증이 반려됐어요',
+                  result.status === '승인'
+                    ? `${result.credential} 자격으로 구인글을 작성할 수 있어요.`
+                    : result.reason || '사유를 확인하고 다시 신청해 주세요.',
+                  'profile',
+                );
+              }}
+            />
+          )}
+
         </section>
       </div>
 
@@ -316,7 +365,15 @@ export function HomePage() {
             setSelectedCoach(null);
             setFeedbackRequested(false);
           }}
-          onRequest={() => setFeedbackRequested(true)}
+          onRequest={() => {
+            setFeedbackRequested(true);
+            pushNotification(
+              '피드백',
+              '피드백 요청이 접수됐어요',
+              `${selectedCoach.nickname} 코치에게 요청을 보냈어요.`,
+              'feedback',
+            );
+          }}
           onChat={() => {
             setChatTitle(selectedCoach.nickname);
             setSelectedCoach(null);
@@ -326,6 +383,16 @@ export function HomePage() {
 
       {verificationOpen && (
         <ProviderVerifyModal profile={profile} setProfile={setProfile} onClose={() => setVerificationOpen(false)} />
+      )}
+
+      {jobPostOpen && (
+        <JobPostModal
+          onClose={() => setJobPostOpen(false)}
+          onSave={() => {
+            notify('구인글이 게시되었습니다.', '피드백 제공자 목록에 반영되었습니다.');
+            setJobPostOpen(false);
+          }}
+        />
       )}
 
       {partyOpen && (

@@ -34,7 +34,7 @@ export function GroupView({
   const filteredParties = partyFilter === '전체' ? parties : parties.filter((party) => party.mode === partyFilter);
 
   return (
-    <div className="max-w-[1040px] mx-auto py-12 px-4">
+    <div className="max-w-[88vw] xl:max-w-[1240px] mx-auto py-12 px-4">
       <PageTitle
         eyebrow="FIND YOUR SQUAD"
         title="혼자보다"
@@ -148,7 +148,7 @@ export function GroupView({
             </div>
 
             {matchDone && (
-              <div className="w-full p-5 border border-accent/40 bg-surface-2 text-center">
+              <div className="w-full p-5 border border-accent/40 bg-accent/10 text-center">
                 <b className="block mb-1">팀이 완성됐어요!</b>
                 <span className="block text-muted text-xs mb-3">MekaPilot · AimArchive · PulseHeal · +1</span>
                 <button onClick={() => onChat(`${partySize}인 랜덤팟`)} className="text-accent text-sm font-bold">

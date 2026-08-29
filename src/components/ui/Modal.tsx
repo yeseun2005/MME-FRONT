@@ -19,7 +19,7 @@ export function Modal({
         aria-modal="true"
         aria-label={label}
         onMouseDown={(event) => event.stopPropagation()}
-        className="relative w-[min(660px,100%)] max-h-[calc(100dvh-56px)] overflow-auto p-9 border border-accent/32 bg-[#151519] shadow-2xl max-[760px]:w-full max-[760px]:max-h-[92dvh] max-[760px]:p-6"
+        className="relative w-[min(660px,100%)] max-h-[calc(100dvh-56px)] overflow-auto p-9 border border-accent/32 bg-surface text-paper shadow-2xl max-[760px]:w-full max-[760px]:max-h-[92dvh] max-[760px]:p-6"
       >
         <button
           onClick={onClose}

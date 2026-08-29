@@ -43,7 +43,7 @@ export function RecordView({
   }
 
   return (
-    <div id="top" className="max-w-[1040px] mx-auto py-12 px-4">
+    <div id="top" className="max-w-[88vw] xl:max-w-[1240px] mx-auto py-12 px-4">
       <PageTitle
         eyebrow="TIER ARCHIVE · AUGUST"
         title="오늘의 플레이를"

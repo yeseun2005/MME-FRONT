@@ -6,4 +6,5 @@ export const navItems: { id: View; label: string; glyph: string }[] = [
   { id: 'group', label: '그룹찾기', glyph: '◫' },
   { id: 'community', label: '커뮤니티', glyph: '▤' },
   { id: 'profile', label: '내 정보', glyph: '●' },
+  { id: 'admin', label: '관리자', glyph: '⚑' },
 ];
