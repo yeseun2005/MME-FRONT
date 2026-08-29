@@ -48,7 +48,7 @@ export function CommunityView({
   const isMvp = category === 'MVP';
 
   return (
-    <div className="max-w-[1040px] mx-auto py-12 px-4">
+    <div className="max-w-[88vw] xl:max-w-[1240px] mx-auto py-12 px-4">
       <PageTitle
         eyebrow="PLAYER COMMUNITY"
         title="플레이의 답은"
@@ -99,8 +99,8 @@ export function CommunityView({
         </section>
       )}
 
-      <div className="grid grid-cols-[1fr_280px] gap-6 max-[900px]:grid-cols-1">
-        <div className="grid gap-3">
+      <div className="grid grid-cols-[1fr_280px] gap-6 items-start max-[900px]:grid-cols-1">
+        <div className="grid gap-3 h-fit">
           {filtered.map((post, index) => (
             <Card
               key={post.id}

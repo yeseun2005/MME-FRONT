@@ -34,7 +34,7 @@ export function MetaView({ data, onDiary }: { data: MetaData; onDiary: () => voi
   const top = ranking.slice(0, 3);
 
   return (
-    <div className="max-w-[1040px] mx-auto py-12 px-4">
+    <div className="max-w-[88vw] xl:max-w-[1240px] mx-auto py-12 px-4">
       <PageTitle
         eyebrow="LIVE META ARCHIVE"
         title="공식 데이터로"
