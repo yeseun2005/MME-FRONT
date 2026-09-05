@@ -4,7 +4,7 @@ import { Modal } from '../../../components/ui/Modal';
 import { FormField, FormGrid } from '../../../components/ui/FormField';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
-import { fileToDataUrl } from '../../../lib/file';
+import { MAX_PROOF_BYTES, fileToDataUrl, formatBytes, validateProofFile } from '../../../lib/file';
 import { saveVerification } from '../../../lib/verification';
 import type { Profile } from '../../../types';
 
@@ -45,6 +45,18 @@ export function ProviderVerifyModal({
     setSubmitError('');
     if (!battletag.trim() || !phone.trim() || !email.trim()) {
       setSubmitError('배틀태그, 전화번호, 이메일을 모두 입력해 주세요.');
+      return;
+    }
+    if (!/^.{3,12}#\d{4,6}$/.test(battletag.trim())) {
+      setSubmitError('배틀태그는 Player#1234 형식으로 입력해 주세요.');
+      return;
+    }
+    if (!/^01[016-9]-?\d{3,4}-?\d{4}$/.test(phone.replace(/\s/g, ''))) {
+      setSubmitError('전화번호는 010-0000-0000 형식으로 입력해 주세요.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+      setSubmitError('올바른 이메일 주소를 입력해 주세요.');
       return;
     }
     if (!proofFile) {
@@ -102,7 +114,7 @@ export function ProviderVerifyModal({
     );
   }
 
-    if (stage === 'approved') {
+  if (stage === 'approved') {
     return (
       <Modal onClose={onClose} label="피드백 제공자 인증 완료">
         <div className="text-center py-8">
@@ -201,13 +213,23 @@ export function ProviderVerifyModal({
             accept="image/jpeg,image/png,image/webp,application/pdf"
             className="hidden"
             onChange={(event) => {
-              setProofFile(event.target.files?.[0] || null);
+              const file = event.target.files?.[0] || null;
+              const invalid = file ? validateProofFile(file) : null;
+              if (invalid) {
+                setProofFile(null);
+                setSubmitError(invalid);
+                event.target.value = '';
+                return;
+              }
+              setProofFile(file);
               setSubmitError('');
             }}
           />
           <span className="text-accent text-3xl">＋</span>
           <b className="text-paper text-[11px]">{proofFile?.name || '순위 또는 선수 경력 증빙 추가'}</b>
-          <small className="text-[#707078] text-[8px]">JPG·PNG·WEBP·PDF · 최대 4MB · 관리자만 열람</small>
+          <small className="text-[#707078] text-[8px]">
+            JPG·PNG·WEBP·PDF · 최대 {formatBytes(MAX_PROOF_BYTES)} · 관리자만 열람
+          </small>
         </label>
 
         {submitError && (
