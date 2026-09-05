@@ -7,12 +7,13 @@ import {
   writeLocalRecords,
 } from '../lib/recordStorage';
 
-function normalizeQuickPlayRanks(records: Record<string, GameRecord>) {
+function normalizeRecords(records: Record<string, GameRecord>) {
   return Object.fromEntries(
-    Object.entries(records).map(([key, record]) => [
-      key,
-      record.mode === '빠른 대전' ? { ...record, tier: '언랭' } : record,
-    ]),
+    Object.entries(records).map(([key, record]) => {
+      // 과거 버전이 저장해 둔 blob URL은 이미 무효이므로 버린다.
+      const { videoUrl: _legacyVideoUrl, ...rest } = record as GameRecord & { videoUrl?: string };
+      return [key, rest.mode === '빠른 대전' ? { ...rest, tier: '언랭' } : rest];
+    }),
   );
 }
 
@@ -22,7 +23,7 @@ export function useGameRecords() {
   useEffect(() => {
     const saved = readLocalRecords<GameRecord>();
     if (Object.keys(saved).length) {
-      const normalized = normalizeQuickPlayRanks(saved);
+      const normalized = normalizeRecords(saved);
       setRecords(normalized);
       writeLocalRecords(normalized);
     }

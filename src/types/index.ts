@@ -22,7 +22,6 @@ export type GameRecord = {
   hero: string;
   memo: string;
   videoName?: string;
-  videoUrl?: string;
 };
 
 export type RecordDraft = {
@@ -34,7 +33,6 @@ export type RecordDraft = {
   hero: string;
   memo: string;
   videoName: string;
-  videoUrl: string;
   videoFile: File | null;
 };
 

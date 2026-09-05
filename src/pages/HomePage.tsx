@@ -58,7 +58,6 @@ export function HomePage() {
     hero: 'D.Va',
     memo: '',
     videoName: '',
-    videoUrl: '',
     videoFile: null,
   });
 
@@ -126,7 +125,6 @@ export function HomePage() {
             hero: existing.hero,
             memo: existing.memo,
             videoName: existing.videoName || '',
-            videoUrl: existing.videoUrl || '',
             videoFile: null,
           }
         : {
@@ -138,7 +136,6 @@ export function HomePage() {
             hero: profile.heroes[0],
             memo: '',
             videoName: '',
-            videoUrl: '',
             videoFile: null,
           },
     );
@@ -156,7 +153,6 @@ export function HomePage() {
       hero: recordDraft.hero,
       memo: recordDraft.memo,
       videoName: recordDraft.videoName,
-      videoUrl: recordDraft.videoUrl,
     });
     notify(`${selectedMode} 기록이 저장되었습니다.`, '기기에 안전하게 저장했습니다.');
     pushNotification('기록', `${selectedMode} 기록이 저장됐어요`, `${selectedDate} · ${recordDraft.hero}`, 'record');
