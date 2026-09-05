@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Hero, HeroStat, MetaData, StatGroup } from '../types';
-import { fetchJson } from '../lib/format';
+import { fetchJson } from '../lib/api';
 
 const emptyMeta: MetaData = { fetchedAt: '', overall: [], ranks: {}, roles: {}, maps: {}, regions: {} };
 
