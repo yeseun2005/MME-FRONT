@@ -6,7 +6,7 @@ export type Hero = {
   slug: string;
   role: 'tank' | 'damage' | 'support';
   subrole: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
 };
 
 export type RecordMode = '빠른 대전' | '경쟁전';
@@ -62,7 +62,7 @@ export type Coach = {
   bio: string;
   verified: boolean;
   credential: 'TOP 500' | 'PRO';
-  image: string;
+  image?: string;
 };
 
 export type Party = {
@@ -100,7 +100,7 @@ export type HeroStat = {
   name: string;
   role: string;
   subrole: string;
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
   pickRate: number;
   winRate: number;
   banRate: number;

@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
 import { Tabs } from '../../components/ui/Tabs';
 import type { MetaData, MetaScope, MetricKey } from '../../types';
+import { HeroImage } from '../../components/ui/HeroImage';
 
 const scopeLabels: Record<MetaScope, string> = {
   overall: '전체',
@@ -108,7 +109,7 @@ export function MetaView({ data, onDiary }: { data: MetaData; onDiary: () => voi
             {top.map((hero, index) => (
               <article key={hero.heroId} className="relative p-5 border border-white/10 bg-surface flex items-center gap-4">
                 <span className="text-3xl font-black text-accent/40">0{index + 1}</span>
-                <img src={hero.thumbnailUrl} alt="" className="w-12 h-12 object-cover" />
+                <HeroImage slug={hero.heroId} name={hero.name} className="w-12 h-12" />
                 <div>
                   <small className="text-muted text-[9px] tracking-widest">
                     {hero.role.toUpperCase()} · {hero.subrole}
@@ -145,7 +146,7 @@ export function MetaView({ data, onDiary }: { data: MetaData; onDiary: () => voi
                 }`}
               >
                 <b className="text-muted">{String(index + 1).padStart(2, '0')}</b>
-                <img src={hero.thumbnailUrl} alt="" className="w-9 h-9 object-cover" />
+                <HeroImage slug={hero.heroId} name={hero.name} className="w-9 h-9" />
                 <strong>{hero.name}</strong>
                 <span className="text-muted text-xs">
                   {hero.role} · {hero.subrole}

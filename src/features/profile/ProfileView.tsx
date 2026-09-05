@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
 import { Card } from '../../components/ui/Card';
 import { TierSelect } from '../../components/ui/TierSelect';
-import { heroImage } from '../../lib/format';
+import { HeroImage } from '../../components/ui/HeroImage';
 import type { Hero, Profile } from '../../types';
 import { HeroSelect } from '../../components/ui/HeroSelect';
 
@@ -44,9 +44,7 @@ export function ProfileView({
       <div className="grid grid-cols-[1fr_1.4fr] gap-6 max-[900px]:grid-cols-1">
         <Card className="flex flex-col">
           <div className="relative h-40">
-            {heroImage(heroes, profile.heroes[0]) && (
-              <img src={heroImage(heroes, profile.heroes[0])} alt="" className="w-full h-full object-cover" />
-            )}
+            <HeroImage heroes={heroes} name={profile.heroes[0]} className="w-full h-full" />
             <div className="absolute left-5 -bottom-6 w-14 h-14 rounded-full grid place-items-center bg-accent text-ink font-black">
               MP
             </div>
@@ -138,9 +136,7 @@ export function ProfileView({
             <div className="flex items-center flex-wrap gap-4">
               {profile.heroes.map((name, index) => (
                 <div key={`hero-slot-${index}`} className="flex items-center gap-2 shrink-0">
-                  {heroImage(heroes, name) && (
-                    <img src={heroImage(heroes, name)} alt="" className="w-9 h-9 object-cover shrink-0" />
-                  )}
+                  <HeroImage heroes={heroes} name={name} className="w-9 h-9 shrink-0" />
                   <span className="text-sm whitespace-nowrap">{name}</span>
                 </div>
               ))}

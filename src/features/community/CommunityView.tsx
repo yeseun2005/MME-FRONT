@@ -3,7 +3,7 @@ import { Card } from '../../components/ui/Card';
 import { PageTitle } from '../../components/layout/PageTitle';
 import { Button } from '../../components/ui/Button';
 import { Tag } from '../../components/ui/Tag';
-import { heroImage } from '../../lib/format';
+import { HeroImage } from '../../components/ui/HeroImage';
 import { PostDetailModal } from './modals/PostDetailModal';
 import type { Hero, Post } from '../../types';
 
@@ -122,9 +122,7 @@ export function CommunityView({
                   {post.hero && <Tag>{post.hero}</Tag>}
                 </div>
               </div>
-              {post.hero && heroImage(heroes, post.hero) && (
-                <img src={heroImage(heroes, post.hero)} alt="" className="w-16 h-16 object-cover shrink-0" />
-              )}
+              {post.hero && <HeroImage heroes={heroes} name={post.hero} className="w-16 h-16 shrink-0" />}
               <div className="flex flex-col items-end justify-between shrink-0">
                 <button
                   onClick={(event) => {
@@ -148,9 +146,7 @@ export function CommunityView({
             {trendingHeroes.map((name, index) => (
               <div key={name} className="flex items-center gap-3">
                 <span className="text-muted text-xs">0{index + 1}</span>
-                {heroImage(heroes, name) && (
-                  <img src={heroImage(heroes, name)} alt="" className="w-8 h-8 object-cover" />
-                )}
+                <HeroImage heroes={heroes} name={name} className="w-8 h-8" />            
                 <b className="flex-1">{name}</b>
                 <i className="not-italic text-accent">↗</i>
               </div>

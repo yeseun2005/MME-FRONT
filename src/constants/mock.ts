@@ -1,9 +1,9 @@
 import type { Coach, Party, Post } from '../types';
 
 export const coaches: Coach[] = [
-  { id: 1, nickname: 'AimArchive', tier: '챔피언 4', position: '공격', heroes: ['애쉬', '캐서디'], price: 24000, rating: 4.9, reviews: 128, bio: '에임 루틴부터 교전 각도까지, 다시 볼 수 있는 타임라인 피드백을 드립니다.', verified: true, credential: 'TOP 500', image: 'https://sht-vod.dn.nexoncdn.co.kr/shpd-game/Hero/OW/4076bbaa2eb52a0bfe612434071e56e7702d5454473dbbea2f9e392a9d997a94.png' },
-  { id: 2, nickname: 'MEKAcoach', tier: '그랜드마스터 1', position: '돌격', heroes: ['D.Va', '윈스턴'], price: 29000, rating: 4.8, reviews: 86, bio: '공간 설계와 진입 타이밍을 중심으로 팀을 이끄는 탱커 플레이를 함께 봅니다.', verified: true, credential: 'PRO', image: 'https://sht-vod.dn.nexoncdn.co.kr/shpd-game/Hero/OW/df5a5532862d9292634fb3dc0e51a4705aa601de65e5e815513ccc663d84de56.png' },
-  { id: 3, nickname: 'PulseHeal', tier: '챔피언 5', position: '지원', heroes: ['아나', '주노'], price: 21000, rating: 4.7, reviews: 54, bio: '힐 우선순위와 생존 동선을 짚어 드려 다음 게임에 바로 적용할 수 있게 합니다.', verified: true, credential: 'TOP 500', image: 'https://sht-vod.dn.nexoncdn.co.kr/shpd-game/Hero/OW/985b06beae46b7ba3ca87d1512d0fc62ca7f206ceca58ef16fc44d43a1cc84ed.png' },
+  { id: 1, nickname: 'AimArchive', tier: '챔피언 4', position: '공격', heroes: ['애쉬', '캐서디'], price: 24000, rating: 4.9, reviews: 128, bio: '에임 루틴부터 교전 각도까지, 다시 볼 수 있는 타임라인 피드백을 드립니다.', verified: true, credential: 'TOP 500' },
+  { id: 2, nickname: 'MEKAcoach', tier: '그랜드마스터 1', position: '돌격', heroes: ['D.Va', '윈스턴'], price: 29000, rating: 4.8, reviews: 86, bio: '공간 설계와 진입 타이밍을 중심으로 팀을 이끄는 탱커 플레이를 함께 봅니다.', verified: true, credential: 'PRO' },
+  { id: 3, nickname: 'PulseHeal', tier: '챔피언 5', position: '지원', heroes: ['아나', '주노'], price: 21000, rating: 4.7, reviews: 54, bio: '힐 우선순위와 생존 동선을 짚어 드려 다음 게임에 바로 적용할 수 있게 합니다.', verified: true, credential: 'TOP 500' },
 ];
 
 export const initialParties: Party[] = [

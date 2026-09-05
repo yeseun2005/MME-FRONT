@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal } from '../../../components/ui/Modal';
 import { Tag } from '../../../components/ui/Tag';
 import { Button } from '../../../components/ui/Button';
-import { heroImage } from '../../../lib/format';
+import { HeroImage } from '../../../components/ui/HeroImage';
 import type { Comment, Hero, Post } from '../../../types';
 
 const CURRENT_USER = 'MekaPilot';
@@ -63,12 +63,12 @@ export function PostDetailModal({
 
       <div className="flex items-start gap-3 mb-4">
         <h2 className="text-2xl font-black break-keep flex-1">{post.title}</h2>
-        {post.hero && heroImage(heroes, post.hero) && (
+        {post.hero && (
           <div className="shrink-0 text-center">
-            <img
-              src={heroImage(heroes, post.hero)}
-              alt=""
-              className="w-11 h-11 rounded-full object-cover border border-white/10"
+            <HeroImage
+              heroes={heroes}
+              name={post.hero}
+              className="w-11 h-11 rounded-full border border-white/10"
             />
             <span className="block text-muted text-[9px] mt-1">{post.hero}</span>
           </div>
