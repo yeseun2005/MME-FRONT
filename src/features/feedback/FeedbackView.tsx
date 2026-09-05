@@ -5,6 +5,7 @@ import { Tag } from '../../components/ui/Tag';
 import { Tabs } from '../../components/ui/Tabs';
 import { money } from '../../lib/format';
 import type { Coach, Profile } from '../../types';
+import { CoachImage } from '../../components/ui/HeroImage';
 
 const positionFilters = ['전체', '돌격', '공격', '지원'] as const;
 
@@ -90,10 +91,10 @@ export function FeedbackView({
         {filtered.map((coach) => (
           <Card key={coach.id} className="group">
             <div className="relative h-56 overflow-hidden">
-              <img
+              <CoachImage
+                nickname={coach.nickname}
                 src={coach.image}
-                alt=""
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                className="w-full h-full transition-transform group-hover:scale-105"
               />
               <Tag variant={coach.credential === 'PRO' ? 'pro' : 'verified'} className="absolute left-3.5 top-3.5">
                 ✓ {coach.credential}

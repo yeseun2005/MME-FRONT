@@ -25,6 +25,7 @@ import { useSaveNotice } from '../hooks/useSaveNotice';
 import { useTheme } from '../hooks/useTheme';
 import { useNotifications } from '../hooks/useNotifications';
 import { coaches, initialParties, initialPosts } from '../constants/mock';
+import { buildCalendarCells, clampDay, dateKey, shiftMonth } from '../lib/date';
 import { JobPostModal } from '../features/feedback/modals/JobPostModal';
 import type { Coach, Party, Post, RecordDraft, RecordMode, View } from '../types';
 
@@ -43,7 +44,9 @@ export function HomePage() {
   const [recordSection, setRecordSection] = useState<'diary' | 'meta'>('diary');
   const [notifOpen, setNotifOpen] = useState(false);
 
-  const [selectedDay, setSelectedDay] = useState(26);
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth() + 1);
+  const [selectedDay, setSelectedDay] = useState(() => new Date().getDate());
   const [selectedMode, setSelectedMode] = useState<RecordMode>('경쟁전');
   const [recordOpen, setRecordOpen] = useState(false);
   const [recordDraft, setRecordDraft] = useState<RecordDraft>({
@@ -55,7 +58,6 @@ export function HomePage() {
     hero: 'D.Va',
     memo: '',
     videoName: '',
-    videoUrl: '',
     videoFile: null,
   });
 
@@ -84,8 +86,22 @@ export function HomePage() {
   ]);
   const [chatInput, setChatInput] = useState('');
 
-  const selectedDate = `2026-08-${String(selectedDay).padStart(2, '0')}`;
-  const calendarDays = useMemo(() => Array.from({ length: 42 }, (_, index) => index - 5), []);
+  const selectedDate = dateKey(viewYear, viewMonth, selectedDay);
+  const calendarDays = useMemo(() => buildCalendarCells(viewYear, viewMonth), [viewYear, viewMonth]);
+
+  function goToMonth(delta: number) {
+    const { year, month } = shiftMonth(viewYear, viewMonth, delta);
+    setViewYear(year);
+    setViewMonth(month);
+    setSelectedDay((current) => clampDay(year, month, current));
+  }
+
+  function goToToday() {
+    const now = new Date();
+    setViewYear(now.getFullYear());
+    setViewMonth(now.getMonth() + 1);
+    setSelectedDay(now.getDate());
+  }
   const roleCounts = useMemo(
     () => ({
       tank: heroes.filter((hero) => hero.role === 'tank').length,
@@ -109,7 +125,6 @@ export function HomePage() {
             hero: existing.hero,
             memo: existing.memo,
             videoName: existing.videoName || '',
-            videoUrl: existing.videoUrl || '',
             videoFile: null,
           }
         : {
@@ -121,7 +136,6 @@ export function HomePage() {
             hero: profile.heroes[0],
             memo: '',
             videoName: '',
-            videoUrl: '',
             videoFile: null,
           },
     );
@@ -139,7 +153,6 @@ export function HomePage() {
       hero: recordDraft.hero,
       memo: recordDraft.memo,
       videoName: recordDraft.videoName,
-      videoUrl: recordDraft.videoUrl,
     });
     notify(`${selectedMode} 기록이 저장되었습니다.`, '기기에 안전하게 저장했습니다.');
     pushNotification('기록', `${selectedMode} 기록이 저장됐어요`, `${selectedDate} · ${recordDraft.hero}`, 'record');
@@ -246,6 +259,11 @@ export function HomePage() {
         <section className="flex-1 min-w-0">
           {view === 'record' && recordSection === 'diary' && (
             <RecordView
+              year={viewYear}
+              month={viewMonth}
+              onPrevMonth={() => goToMonth(-1)}
+              onNextMonth={() => goToMonth(1)}
+              onToday={goToToday}
               selectedDay={selectedDay}
               setSelectedDay={setSelectedDay}
               calendarDays={calendarDays}

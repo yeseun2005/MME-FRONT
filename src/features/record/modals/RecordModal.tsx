@@ -1,5 +1,5 @@
-import type { Dispatch, FormEvent, SetStateAction } from 'react';
-import { Modal } from '../../../components/ui/Modal';
+import { useEffect, useState } from 'react';
+import type { Dispatch, FormEvent, SetStateAction } from 'react';import { Modal } from '../../../components/ui/Modal';
 import { FormField, FormGrid } from '../../../components/ui/FormField';
 import { Select } from '../../../components/ui/Select';
 import { Textarea } from '../../../components/ui/Textarea';
@@ -7,6 +7,7 @@ import { Button } from '../../../components/ui/Button';
 import { tierOptions } from '../../../constants/tiers';
 import type { Hero, RecordDraft, RecordMode } from '../../../types';
 import { HeroSelect } from '../../../components/ui/HeroSelect';
+import { MAX_VIDEO_BYTES, formatBytes, validateVideoFile } from '../../../lib/file';
 
 export function RecordModal({
   draft,
@@ -25,6 +26,18 @@ export function RecordModal({
   onClose: () => void;
   onSave: (event: FormEvent) => void;
 }) {
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [videoError, setVideoError] = useState('');
+  useEffect(() => {
+    if (!draft.videoFile) {
+      setPreviewUrl('');
+      return;
+    }
+    const url = URL.createObjectURL(draft.videoFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [draft.videoFile]);
+
   return (
     <Modal onClose={onClose} label="게임 기록 작성">
       <form onSubmit={onSave} className="grid gap-4.5">
@@ -117,19 +130,44 @@ export function RecordModal({
             className="hidden"
             onChange={(event) => {
               const file = event.target.files?.[0];
-              if (file)
-                setDraft((current) => ({
-                  ...current,
-                  videoName: file.name,
-                  videoUrl: URL.createObjectURL(file),
-                  videoFile: file,
-                }));
+              if (!file) return;
+              const invalid = validateVideoFile(file);
+              if (invalid) {
+                setVideoError(invalid);
+                event.target.value = '';
+                return;
+              }
+              setVideoError('');
+              setDraft((current) => ({
+                ...current,
+                videoName: file.name,
+                videoFile: file,
+              }));
             }}
           />
           <span className="text-accent text-3xl">＋</span>
           <b className="text-paper text-[11px]">{draft.videoName || '최고의 플레이 영상 추가'}</b>
-          <small className="text-[#707078] text-[8px]">저장하면 Firebase Storage에 안전하게 업로드됩니다.</small>
+          <small className="text-[#707078] text-[8px]">
+            MP4·WEBM·MOV · 최대 {formatBytes(MAX_VIDEO_BYTES)} · 파일 이름만 기록에 남습니다.
+          </small>
         </label>
+
+        {videoError && (
+          <p role="alert" className="text-red-400 text-xs">
+            {videoError}
+          </p>
+        )}
+
+        {previewUrl && (
+          <video src={previewUrl} controls className="w-full max-h-64 bg-black" />
+        )}
+
+        {!previewUrl && draft.videoName && (
+          <p className="text-muted text-xs">
+            이전에 <b className="text-paper">{draft.videoName}</b>을(를) 첨부했습니다. 다시 재생하려면 파일을 새로
+            선택해 주세요.
+          </p>
+        )}
 
         <Button type="submit" variant="primary" size="wide" icon="✓">
           기록 저장하기

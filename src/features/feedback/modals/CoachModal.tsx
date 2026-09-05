@@ -3,6 +3,7 @@ import { Modal } from '../../../components/ui/Modal';
 import { Button } from '../../../components/ui/Button';
 import { money } from '../../../lib/format';
 import type { Coach } from '../../../types';
+import { CoachImage } from '../../../components/ui/HeroImage';
 
 export function CoachModal({
   coach,
@@ -20,7 +21,7 @@ export function CoachModal({
   return (
     <Modal onClose={onClose} label={`${coach.nickname} 피드백 상세`}>
       <div className="flex items-center gap-4 mb-6">
-        <img src={coach.image} alt="" className="w-20 h-24 object-cover" />
+        <CoachImage nickname={coach.nickname} src={coach.image} className="w-20 h-24" />
         <div>
           <p className="text-accent text-[11px] font-extrabold tracking-[0.2em]">
             VERIFIED · {coach.credential}
