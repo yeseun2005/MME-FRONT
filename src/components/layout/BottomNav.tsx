@@ -1,25 +1,25 @@
+import { NavLink } from 'react-router-dom';
 import { navItems } from '../../constants/nav';
-import type { View } from '../../types';
 
-export function BottomNav({ view, setView }: { view: View; setView: (view: View) => void }) {
+export function BottomNav() {
   return (
     <nav
       aria-label="주요 메뉴"
       className="lg:hidden fixed left-1/2 bottom-4.5 z-20 w-[min(820px,calc(100%-28px))] h-[70px] p-1.5 grid grid-cols-6 -translate-x-1/2 border border-white/10 bg-[#121216]/92 shadow-2xl backdrop-blur-lg"
     >
       {navItems.map((item) => (
-        <button
+        <NavLink
           key={item.id}
-          onClick={() => setView(item.id)}
-          className={
-            view === item.id
-              ? 'bg-accent text-ink text-[11px] font-bold'
-              : 'bg-transparent text-[#888891] text-[11px] font-bold'
+          to={item.path}
+          className={({ isActive }) =>
+            isActive
+              ? 'grid place-content-center bg-accent text-ink text-[11px] font-bold no-underline'
+              : 'grid place-content-center bg-transparent text-[#888891] text-[11px] font-bold no-underline'
           }
         >
-          <span className="block mb-1 text-sm">{item.glyph}</span>
+          <span className="block mb-1 text-sm text-center">{item.glyph}</span>
           {item.label}
-        </button>
+        </NavLink>
       ))}
     </nav>
   );
